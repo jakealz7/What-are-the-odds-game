@@ -1,8 +1,16 @@
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 import numpy as np
+from itertools import product
+
+class Config(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    n: int
+    pt_m: np.ndarray
+    pt_nm: np.ndarray
 
 class Player(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     class DesiredOutcome(Enum):
         MATCH = 0
         NO_MATCH = 1
@@ -18,6 +26,7 @@ class Player(BaseModel):
         return rolls
 
 class Game(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     # init
     Matcher: Player
     NoMatcher: Player
@@ -30,3 +39,18 @@ class Game(BaseModel):
         no_matcher_wins = np.logical_or(temp==self.Matcher.n, temp==2*self.Matcher.n)
         results[no_matcher_wins] = 0 # If the Matcher wins, the result is a 1, otherwise the result is a 0
         return float(np.mean(results))
+
+class BetterGame(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    n: int
+    pt_m: np.ndarray
+    pt_nm: np.ndarray
+
+    def get_results(self) -> np.ndarray:
+        if self.pt_m.size != self.pt_m.size:
+            raise ValueError("pt_m and pt_nm must have same length")
+        pt_m_mg, pt_nm_mg = np.meshgrid(self.pt_m, self.pt_nm, indexing='ij')
+        # See readme for derivation
+        results = pt_nm_mg*(-(2/(self.n-1)+1)*pt_m_mg+2/(self.n-1))+(2/(self.n-1))*pt_m_mg+(1-2/(self.n-1))
+
+        return results

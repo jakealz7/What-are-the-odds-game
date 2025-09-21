@@ -9,3 +9,7 @@ Evaluate different strategies in a game of "What are the odds"
 
 ## Question:
 If the no matcher chooses any number less than n their opponent has 2 possible options that will cause the no matcher to lose, but if they choose n then there is only one possible number that causes the no matcher to win. What is the optimal strategy for different values of n for each player, and is there a Nash equilibrium?
+
+
+## Game expected value as a function of P_m_t and P_nm_t
+TODO  
